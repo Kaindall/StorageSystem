@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   kafka:
     image: bitnami/kafka:3.7
@@ -12,7 +10,7 @@ services:
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,DOCKER://:9094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092,DOCKER://kafka:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,DOCKER://kafka:9094
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,DOCKER:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=DOCKER
@@ -23,9 +21,73 @@ services:
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     ports:
-      - "8081:8080"
+      - "9070:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local-kraft
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9094
     depends_on:
       - kafka
+
+  mysql:
+    image: mysql:8.0
+    container_name: db_storage
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: STORAGE
+      MYSQL_USER: Kaindall
+      MYSQL_PASSWORD: 123456
+    ports:
+      - "9090:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app-products:
+    build:
+      context: ./products
+      dockerfile: Dockerfile
+    container_name: products
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8000:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/STORAGE?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: Kaindall
+      SPRING_DATASOURCE_PASSWORD: 123456
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL-AUTO: create
+      SPRING_JPA_SHOW-SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+      SPRINGDOC_API-DOCS_PATH: /openapi
+      SPRINGDOC_SWAGGER-UI_PATH: /openapi-ui
+
+  app-orders:
+    build:
+      context: ./orders
+      dockerfile: Dockerfile
+    container_name: orders
+    depends_on:
+      kafka:
+        condition: service_started
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8001:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/STORAGE?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: Kaindall
+      SPRING_DATASOURCE_PASSWORD: 123456
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL-AUTO: create
+      SPRING_JPA_SHOW-SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+
+
+volumes:
+  mysql_data:

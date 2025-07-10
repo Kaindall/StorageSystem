@@ -1,0 +1,64 @@
+package br.com.kaindall.products.infrastructure.adapters.product.mappers;
+
+import br.com.kaindall.products.domain.category.entities.Category;
+import br.com.kaindall.products.domain.product.entities.Product;
+import br.com.kaindall.products.domain.product.entities.exceptions.InvalidProductException;
+import br.com.kaindall.products.infrastructure.adapters.category.mappers.CategoryEntityMapper;
+import br.com.kaindall.products.infrastructure.jpa.product.entities.ProductEntity;
+import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Field;
+
+@Component
+public class ProductEntityMapper {
+    private final CategoryEntityMapper categoryMapper;
+
+    public ProductEntityMapper(CategoryEntityMapper categoryMapper) {
+        this.categoryMapper = categoryMapper;
+    }
+
+    public ProductEntity toEntity(ProductEntity target, Product source) {
+        Field[] sourceAttributes = source.getClass().getDeclaredFields();
+        for (Field attribute : sourceAttributes) {
+            try {
+                attribute.setAccessible(true);
+                Object value = attribute.get(source);
+                if (value != null) {
+                    Field targetAttr = target.getClass().getDeclaredField(attribute.getName());
+                    targetAttr.setAccessible(true);
+                    if (attribute.getName().equals("category") && value instanceof Category) {
+                        targetAttr.set(target, categoryMapper.toEntity((Category) value));
+                    } else {
+                        targetAttr.set(target, value);
+                    }
+                }
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new InvalidProductException();
+            }
+        }
+        return target;
+    }
+
+    public ProductEntity toEntity(Product product) {
+        return new ProductEntity(
+                product.id(),
+                product.name(),
+                product.description(),
+                categoryMapper.toEntity(product.category()),
+                product.price(),
+                product.quantity(),
+                false
+        );
+    }
+
+    public Product toDomain(ProductEntity product) {
+        return new Product(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                categoryMapper.toDomain(product.getCategory()),
+                product.getPrice(),
+                product.getQuantity()
+        );
+    }
+}
