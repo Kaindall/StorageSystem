@@ -1,7 +1,7 @@
 package br.com.kaindall.orders.infrastructure.adapters.movements.mappers;
 
 import br.com.kaindall.orders.domain.movements.entities.Movement;
-import br.com.kaindall.orders.infrastructure.qeue.producers.movements.entities.MovementMessage;
+import br.com.kaindall.orders.infrastructure.queue.producers.movements.entities.MovementMessage;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

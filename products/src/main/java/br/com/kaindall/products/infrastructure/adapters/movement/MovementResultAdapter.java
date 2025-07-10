@@ -2,13 +2,12 @@ package br.com.kaindall.products.infrastructure.adapters.movement;
 
 import br.com.kaindall.products.domain.exceptions.BusinessException;
 import br.com.kaindall.products.domain.movement.entities.Movement;
-import br.com.kaindall.products.domain.movement.entities.exceptions.InvalidMovementException;
 import br.com.kaindall.products.domain.movement.gateways.MovementResultGateway;
 import br.com.kaindall.products.domain.product.entities.exceptions.ProductNotFoundException;
 import br.com.kaindall.products.domain.product.entities.exceptions.UnavailableProductQuantityException;
-import br.com.kaindall.products.infrastructure.qeue.movements.MovementResultProducerStrategy;
-import br.com.kaindall.products.infrastructure.qeue.movements.entities.MovementResultMessage;
-import br.com.kaindall.products.infrastructure.qeue.movements.utils.MovementResultStatus;
+import br.com.kaindall.products.infrastructure.queue.movements.MovementResultProducerStrategy;
+import br.com.kaindall.products.infrastructure.queue.movements.entities.MovementResultMessage;
+import br.com.kaindall.products.infrastructure.queue.movements.utils.MovementResultStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

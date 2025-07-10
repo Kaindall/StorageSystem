@@ -3,7 +3,7 @@ package br.com.kaindall.orders.infrastructure.adapters.movements;
 import br.com.kaindall.orders.domain.movements.entities.Movement;
 import br.com.kaindall.orders.domain.movements.gateways.MovementGateway;
 import br.com.kaindall.orders.infrastructure.adapters.movements.mappers.MovementMessageMapper;
-import br.com.kaindall.orders.infrastructure.qeue.producers.movements.MovementProducerStrategy;
+import br.com.kaindall.orders.infrastructure.queue.producers.movements.MovementProducerStrategy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

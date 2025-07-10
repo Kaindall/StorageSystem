@@ -1,6 +1,6 @@
-package br.com.kaindall.products.application.configs;
+package br.com.kaindall.orders.application.queue.configs;
 
-import br.com.kaindall.products.application.queue.dtos.MovementEvent;
+import br.com.kaindall.orders.application.queue.dtos.MovementResultEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,15 +23,15 @@ public class KafkaConsumerConfig {
     private String groupId;
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, MovementEvent> kafkaMovementListenerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, MovementEvent> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, MovementResultEvent> kafkaMovementListenerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, MovementResultEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
 
-    private ConsumerFactory<String, MovementEvent> consumerFactory() {
-        JsonDeserializer<MovementEvent> jsonDeserializer = new JsonDeserializer<>(MovementEvent.class, false);
+    private ConsumerFactory<String, MovementResultEvent> consumerFactory() {
+        JsonDeserializer<MovementResultEvent> jsonDeserializer = new JsonDeserializer<>(MovementResultEvent.class, false);
         jsonDeserializer.addTrustedPackages("*");
 
         Map<String, Object> configs = new HashMap<>();

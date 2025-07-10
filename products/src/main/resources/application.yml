@@ -23,5 +23,5 @@ kafka:
   producer:
     topic: movement-result
   consumer:
-    topic: movement-qeue
+    topic: movement
     group-id: products-consumer-1
