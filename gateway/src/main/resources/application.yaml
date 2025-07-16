@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: test
+              uri: https://httpbin.org
+              predicates:
+                - Path=/get
+            - id: app-products-root
+              uri: http://app-products:8082
+              predicates:
+                - Path=/products
+              filters:
+                - RewritePath=/products, /products/
+            - id: app-products
+              uri: http://app-products:8082
+              predicates:
+                - Path=/products/**
+            - id: app-orders
+              uri: http://app-orders:8081
+              predicates:
+                - Path=/orders**
+              filters:
+                - RewritePath=/orders, /orders/
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:9091/realms/dev
+logging:
+  level:
+    ROOT: DEBUG

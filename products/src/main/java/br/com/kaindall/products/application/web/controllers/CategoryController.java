@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5174")
-@RestController()
+@RestController
 @RequestMapping("/categories")
 @Tag(name = "Categorias", description = "Operações acerca das categorias de produto")
 public class CategoryController {

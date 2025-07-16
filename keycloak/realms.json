@@ -1,0 +1,24 @@
+{
+  "realm": "dev",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "dev",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": ["*"]
+    }
+  ],
+  "users": [
+    {
+      "username": "app_gateway",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "teste"
+        }
+      ]
+    }
+  ]
+}
