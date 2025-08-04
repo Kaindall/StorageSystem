@@ -1,0 +1,16 @@
+server:
+  port: 8070
+spring:
+  application:
+    name: discovery
+  cloud:
+    service-registry:
+      auto-registration:
+        enabled: false
+eureka:
+  instance:
+    hostname: app-discovery
+    register-with-eureka: false
+    fetch-registry: false
+  username: kaindall
+  password: 123456

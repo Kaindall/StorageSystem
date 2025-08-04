@@ -19,6 +19,12 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
   main:
     allow-bean-definition-overriding: true
+eureka:
+  client:
+    service-url:
+      defaultZone: http://app-discovery:8070/eureka/
+  instance:
+    prefer-ip-address: true
 kafka:
   url: kafka:9092
   producer:

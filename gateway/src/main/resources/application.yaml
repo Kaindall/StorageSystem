@@ -3,6 +3,11 @@ spring:
     name: gateway
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+          filters:
       server:
         webflux:
           routes:
@@ -10,27 +15,46 @@ spring:
               uri: https://httpbin.org
               predicates:
                 - Path=/get
-            - id: app-products-root
-              uri: http://app-products:8082
+#            - id: app-products-root
+#              uri: http://app-products:8082
+#              predicates:
+#                - Path=/products
+#              filters:
+#                - RewritePath=/products, /products/
+#            - id: app-products
+#              uri: http://app-products:8082
+#              predicates:
+#                - Path=/products/**
+#            - id: app-orders
+#              uri: http://app-orders:8081
+#              predicates:
+#                - Path=/orders**
+#              filters:
+#                - RewritePath=/orders, /orders/
+            - id: app-discover
+              uri: http://app-discovery:8070
               predicates:
-                - Path=/products
+                - Path=/eureka/web
               filters:
-                - RewritePath=/products, /products/
-            - id: app-products
-              uri: http://app-products:8082
+                - SetPath=/
+            - id: discovery-static
+              uri: http://app-discovery:8070
               predicates:
-                - Path=/products/**
-            - id: app-orders
-              uri: http://app-orders:8081
-              predicates:
-                - Path=/orders**
-              filters:
-                - RewritePath=/orders, /orders/
+                - Path=/eureka/**
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://keycloak:9091/realms/dev
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://kaindall:123456@app-discovery:8070/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+    instance:
+      prefer-ip-address: false
+      hostname: app-gateway
 logging:
   level:
     ROOT: DEBUG

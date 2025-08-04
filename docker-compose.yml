@@ -17,6 +17,8 @@ services:
       - KAFKA_KRAFT_CLUSTER_ID=LfxF6DB9TjGkl8gSn0UfKg
     volumes:
       - ./kafka:/bitnami/kafka
+    networks:
+      - queue
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -27,6 +29,8 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9094
     depends_on:
       - kafka
+    networks:
+      - queue
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.3
@@ -38,6 +42,8 @@ services:
       - 9091:8080
     volumes:
       - ./keycloak/realms.json:/opt/keycloak/data/import/realm-export.json
+    networks:
+      - security
 
   mysql:
     image: mysql:8.0
@@ -51,6 +57,8 @@ services:
       - "9000:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - database
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -61,6 +69,8 @@ services:
     build:
       context: ./products
     depends_on:
+      app-discovery:
+        condition: service_started
       mysql:
         condition: service_healthy
     ports:
@@ -75,6 +85,10 @@ services:
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
       SPRINGDOC_API-DOCS_PATH: /openapi
       SPRINGDOC_SWAGGER-UI_PATH: /openapi-ui
+    networks:
+      - backend
+      - database
+      - queue
 
   app-orders:
     build:
@@ -94,6 +108,10 @@ services:
       SPRING_JPA_HIBERNATE_DDL-AUTO: create
       SPRING_JPA_SHOW-SQL: "true"
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+    networks:
+      - backend
+      - database
+      - queue
 
   app-gateway:
     build:
@@ -102,6 +120,36 @@ services:
       - 8080:8080
     depends_on:
       - keycloak
+      - app-discovery
+    networks:
+      - backend
+      - security
+
+
+  app-discovery:
+    build:
+      context: ./discovery
+    ports:
+      - "8070:8070"
+    environment:
+      SPRING_APPLICATION_NAME: discovery
+      EUREKA_INSTANCE_HOSTNAME: localhost
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
+      EUREKA_CLIENT_FETCH_REGISTRY: "false"
+      EUREKA_USERNAME: kaindall
+      EUREKA_PASSWORD: 123456
+    networks:
+      - backend
 
 volumes:
   mysql_data:
+
+networks:
+  backend:
+    driver: bridge
+  database:
+    driver: bridge
+  queue:
+    driver: bridge
+  security:
+    driver: bridge
