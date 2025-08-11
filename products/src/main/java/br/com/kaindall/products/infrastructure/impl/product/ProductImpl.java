@@ -1,4 +1,4 @@
-package br.com.kaindall.products.infrastructure.adapters.product;
+package br.com.kaindall.products.infrastructure.impl.product;
 
 import br.com.kaindall.products.domain.product.gateways.ProductGateway;
 import br.com.kaindall.products.domain.product.entities.Product;
@@ -7,7 +7,7 @@ import br.com.kaindall.products.domain.category.entities.exceptions.InvalidCateg
 import br.com.kaindall.products.domain.product.entities.exceptions.InvalidProductException;
 import br.com.kaindall.products.domain.product.entities.exceptions.ProductNotFoundException;
 import br.com.kaindall.products.domain.product.entities.exceptions.UnavailableProductQuantityException;
-import br.com.kaindall.products.infrastructure.adapters.product.mappers.ProductEntityMapper;
+import br.com.kaindall.products.infrastructure.impl.product.mappers.ProductEntityMapper;
 import br.com.kaindall.products.infrastructure.jpa.product.entities.ProductEntity;
 import br.com.kaindall.products.infrastructure.jpa.product.repositories.ProductRepository;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,11 +20,11 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Component
-public class ProductAdapter implements ProductGateway {
+public class ProductImpl implements ProductGateway {
     private final ProductRepository productRepository;
     private final ProductEntityMapper productMapper;
 
-    public ProductAdapter(ProductRepository productRepository, ProductEntityMapper productMapper) {
+    public ProductImpl(ProductRepository productRepository, ProductEntityMapper productMapper) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
     }

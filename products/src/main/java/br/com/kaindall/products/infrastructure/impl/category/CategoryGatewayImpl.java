@@ -1,10 +1,10 @@
-package br.com.kaindall.products.infrastructure.adapters.category;
+package br.com.kaindall.products.infrastructure.impl.category;
 
 import br.com.kaindall.products.domain.category.gateways.CategoryGateway;
 import br.com.kaindall.products.domain.category.entities.Category;
 import br.com.kaindall.products.domain.category.entities.exceptions.CategoryNotFoundException;
 import br.com.kaindall.products.domain.category.entities.exceptions.InvalidCategoryException;
-import br.com.kaindall.products.infrastructure.adapters.category.mappers.CategoryEntityMapper;
+import br.com.kaindall.products.infrastructure.impl.category.mappers.CategoryEntityMapper;
 import br.com.kaindall.products.infrastructure.jpa.category.entities.CategoryEntity;
 import br.com.kaindall.products.infrastructure.jpa.category.repositories.CategoryRepository;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class CategoryAdapter implements CategoryGateway {
+public class CategoryGatewayImpl implements CategoryGateway {
     private final CategoryRepository categoryRepository;
     private final CategoryEntityMapper categoryMapper;
 
-    public CategoryAdapter(CategoryRepository categoryRepository, CategoryEntityMapper categoryMapper) {
+    public CategoryGatewayImpl(CategoryRepository categoryRepository, CategoryEntityMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
     }

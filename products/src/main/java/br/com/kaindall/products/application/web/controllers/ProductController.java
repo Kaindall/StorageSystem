@@ -4,7 +4,9 @@ import br.com.kaindall.products.application.web.dtos.requests.CreateProductDTO;
 import br.com.kaindall.products.application.web.dtos.requests.UpdateProductDTO;
 import br.com.kaindall.products.application.web.dtos.responses.ProductDTO;
 import br.com.kaindall.products.application.web.mappers.ProductMapper;
+import br.com.kaindall.products.domain.category.services.CategoryService;
 import br.com.kaindall.products.domain.product.facades.ProductFacade;
+import br.com.kaindall.products.domain.product.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,10 +23,14 @@ import java.util.List;
 public class ProductController {
     private final ProductFacade productFacade;
     private final ProductMapper productMapper;
+    private final ProductService productService;
+    private final CategoryService categoryService;
 
-    public ProductController(ProductFacade productFacade, ProductMapper productMapper) {
+    public ProductController(ProductFacade productFacade, ProductMapper productMapper, ProductService productService, CategoryService categoryService) {
         this.productFacade = productFacade;
         this.productMapper = productMapper;
+        this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     @Operation(
@@ -35,9 +41,9 @@ public class ProductController {
     public ResponseEntity<Long> createProduct(@RequestBody CreateProductDTO product) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(productFacade.save(productMapper.toDomain(
+                .body(productService.save(productMapper.toDomain(
                         product,
-                        productFacade.findCategory(product.categoryName())))
+                        categoryService.retrieveByName(product.categoryName())))
                         .id()
                 );
     }
@@ -52,8 +58,8 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sort,
             @RequestParam(defaultValue = "true") boolean ascending) {
-        List<ProductDTO> products = productFacade
-                .batchRetrieve(productMapper.toPagination(page-1, size, sort, ascending))
+        List<ProductDTO> products = productService
+                .findAll(productMapper.toPagination(page-1, size, sort, ascending))
                 .stream()
                 .map(productMapper::toDTO)
                 .toList();
@@ -86,7 +92,7 @@ public class ProductController {
             @PathVariable(name="id_product") Long id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(productMapper.toDTO(productFacade.find(id)));
+                .body(productMapper.toDTO(productService.find(id)));
     }
 
     @Operation(
@@ -98,7 +104,7 @@ public class ProductController {
             @Parameter(description="Identificador do produto-alvo")
             @PathVariable(name="id_product") Long id,
             @RequestBody UpdateProductDTO product) {
-        productFacade.save(productMapper.toDomain(product, id, productFacade.findCategory(product.categoryName())));
+        productService.save(productMapper.toDomain(product, id, categoryService.retrieveByName(product.categoryName())));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

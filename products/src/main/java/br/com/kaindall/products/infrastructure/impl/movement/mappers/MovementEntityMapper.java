@@ -1,8 +1,8 @@
-package br.com.kaindall.products.infrastructure.adapters.movement.mappers;
+package br.com.kaindall.products.infrastructure.impl.movement.mappers;
 
 import br.com.kaindall.products.domain.movement.entities.Movement;
 import br.com.kaindall.products.domain.movement.utils.builders.MovementBuilder;
-import br.com.kaindall.products.infrastructure.adapters.product.mappers.ProductEntityMapper;
+import br.com.kaindall.products.infrastructure.impl.product.mappers.ProductEntityMapper;
 import br.com.kaindall.products.infrastructure.jpa.movement.entities.MovementEntity;
 import org.springframework.stereotype.Component;
 

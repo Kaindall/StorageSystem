@@ -1,9 +1,9 @@
-package br.com.kaindall.products.infrastructure.adapters.movement;
+package br.com.kaindall.products.infrastructure.impl.movement;
 
 import br.com.kaindall.products.domain.movement.entities.exceptions.MovementNotFoundException;
 import br.com.kaindall.products.domain.movement.gateways.MovementGateway;
 import br.com.kaindall.products.domain.movement.entities.Movement;
-import br.com.kaindall.products.infrastructure.adapters.movement.mappers.MovementEntityMapper;
+import br.com.kaindall.products.infrastructure.impl.movement.mappers.MovementEntityMapper;
 import br.com.kaindall.products.infrastructure.jpa.movement.repositories.MovementRepository;
 import org.springframework.stereotype.Component;
 
@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Component
-public class MovementAdapter implements MovementGateway {
+public class MovementImpl implements MovementGateway {
     private final MovementRepository movementRepository;
     private final MovementEntityMapper movementMapper;
 
-    public MovementAdapter(MovementRepository movementRepository, MovementEntityMapper movementMapper) {
+    public MovementImpl(MovementRepository movementRepository, MovementEntityMapper movementMapper) {
         this.movementRepository = movementRepository;
         this.movementMapper = movementMapper;
     }

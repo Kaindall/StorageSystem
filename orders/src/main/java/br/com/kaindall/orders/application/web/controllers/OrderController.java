@@ -5,6 +5,7 @@ import br.com.kaindall.orders.application.web.dtos.response.OrderResponseDTO;
 import br.com.kaindall.orders.application.web.mappers.OrderMapper;
 import br.com.kaindall.orders.domain.orders.facade.OrderFacade;
 import br.com.kaindall.orders.domain.orders.entities.Order;
+import br.com.kaindall.orders.domain.orders.services.OrderService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -20,10 +21,12 @@ public class OrderController {
     private final Logger log = LogManager.getLogger();
     private final OrderFacade orderFacade;
     private final OrderMapper orderMapper;
+    private final OrderService orderService;
 
-    public OrderController(OrderFacade orderFacade, OrderMapper orderMapper) {
+    public OrderController(OrderFacade orderFacade, OrderMapper orderMapper, OrderService orderService) {
         this.orderFacade = orderFacade;
         this.orderMapper = orderMapper;
+        this.orderService = orderService;
     }
 
 
@@ -40,8 +43,8 @@ public class OrderController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "date") String sort,
             @RequestParam(defaultValue = "true") boolean ascending) {
-        List<OrderResponseDTO> orders = orderFacade
-                .pagedQueryByUser(userId, orderMapper.toPagination(page-1, size, sort, ascending))
+        List<OrderResponseDTO> orders = orderService
+                .batchRetrieveByUser(userId, orderMapper.toPagination(page-1, size, sort, ascending))
                 .stream()
                 .map(orderMapper::toDTO)
                 .toList();

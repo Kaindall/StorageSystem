@@ -1,4 +1,4 @@
-package br.com.kaindall.products.infrastructure.adapters.movement;
+package br.com.kaindall.products.infrastructure.impl.movement;
 
 import br.com.kaindall.products.domain.exceptions.BusinessException;
 import br.com.kaindall.products.domain.movement.entities.Movement;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class MovementResultAdapter implements MovementResultGateway {
+public class MovementResultImpl implements MovementResultGateway {
     private final MovementResultProducerStrategy movementResultProducer;
 
-    MovementResultAdapter(MovementResultProducerStrategy movementResultProducer) {
+    MovementResultImpl(MovementResultProducerStrategy movementResultProducer) {
         this.movementResultProducer = movementResultProducer;
     }
 

@@ -1,9 +1,9 @@
-package br.com.kaindall.products.infrastructure.adapters.product.mappers;
+package br.com.kaindall.products.infrastructure.impl.product.mappers;
 
 import br.com.kaindall.products.domain.category.entities.Category;
 import br.com.kaindall.products.domain.product.entities.Product;
 import br.com.kaindall.products.domain.product.entities.exceptions.InvalidProductException;
-import br.com.kaindall.products.infrastructure.adapters.category.mappers.CategoryEntityMapper;
+import br.com.kaindall.products.infrastructure.impl.category.mappers.CategoryEntityMapper;
 import br.com.kaindall.products.infrastructure.jpa.product.entities.ProductEntity;
 import org.springframework.stereotype.Component;
 

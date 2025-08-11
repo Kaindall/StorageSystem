@@ -3,7 +3,7 @@ package br.com.kaindall.products.application.web.controllers;
 import br.com.kaindall.products.application.web.dtos.responses.MovementDTO;
 import br.com.kaindall.products.application.web.mappers.MovementMapper;
 import br.com.kaindall.products.application.web.mappers.ProductMapper;
-import br.com.kaindall.products.domain.product.facades.ProductFacade;
+import br.com.kaindall.products.domain.movement.services.MovementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,11 +20,11 @@ import java.util.List;
 @RequestMapping("/movements")
 @Tag(name = "Movimentos", description = "Operações para consultar as movimentações")
 public class MovementsController {
-    private final ProductFacade productFacade;
+    private final MovementService movementService;
     private final MovementMapper movementMapper;
 
-    public MovementsController(ProductFacade productFacade, ProductMapper productMapper, MovementMapper movementMapper) {
-        this.productFacade = productFacade;
+    public MovementsController(MovementService movementService, ProductMapper productMapper, MovementMapper movementMapper) {
+        this.movementService = movementService;
         this.movementMapper = movementMapper;
     }
 
@@ -40,7 +40,7 @@ public class MovementsController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(
-                        productFacade.findMovements(id)
+                        movementService.findAll(id)
                                 .stream()
                                 .map(movementMapper::toDTO)
                                 .toList()

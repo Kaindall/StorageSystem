@@ -1,4 +1,4 @@
-package br.com.kaindall.products.infrastructure.adapters.category.mappers;
+package br.com.kaindall.products.infrastructure.impl.category.mappers;
 
 import br.com.kaindall.products.domain.category.entities.Category;
 import br.com.kaindall.products.domain.category.entities.exceptions.InvalidCategoryException;
