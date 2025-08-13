@@ -3,10 +3,13 @@
   "enabled": true,
   "clients": [
     {
-      "clientId": "dev",
+      "clientId": "cleber",
       "enabled": true,
-      "publicClient": true,
-      "redirectUris": ["*"]
+      "publicClient": false, 
+      "secret": "cleber@2025",
+      "redirectUris": ["*"],
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true 
     }
   ],
   "users": [
@@ -16,7 +19,7 @@
       "credentials": [
         {
           "type": "password",
-          "value": "teste"
+          "value": "gateway"
         }
       ]
     }

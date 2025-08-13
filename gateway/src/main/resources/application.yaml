@@ -15,22 +15,12 @@ spring:
               uri: https://httpbin.org
               predicates:
                 - Path=/get
-#            - id: app-products-root
-#              uri: http://app-products:8082
-#              predicates:
-#                - Path=/products
-#              filters:
-#                - RewritePath=/products, /products/
-#            - id: app-products
-#              uri: http://app-products:8082
-#              predicates:
-#                - Path=/products/**
-#            - id: app-orders
-#              uri: http://app-orders:8081
-#              predicates:
-#                - Path=/orders**
-#              filters:
-#                - RewritePath=/orders, /orders/
+            - id: app-keycloak
+              uri: http://keycloak:9091
+              predicates:
+                - Path=/oauth/token
+              filters:
+                - RewritePath=/oauth/token,/realms/dev/protocol/openid-connect/token
             - id: app-discover
               uri: http://app-discovery:8070
               predicates:
