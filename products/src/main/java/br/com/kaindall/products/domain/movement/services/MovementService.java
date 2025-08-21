@@ -64,7 +64,7 @@ public class MovementService {
         movementGateway.saveAll(movements
                 .stream()
                 .map(movement -> new Movement(
-                        movement.movementId(),
+                        null,
                         movement.orderId(),
                         movement.product(),
                         MovementType.CANCELED,
@@ -72,5 +72,16 @@ public class MovementService {
                         movement.price(),
                         movement.date()))
                 .toList());
+    }
+
+    public void cancel(Movement movement) {
+        movementGateway.save(new Movement(
+                null,
+                movement.orderId(),
+                movement.product(),
+                MovementType.CANCELED,
+                movement.quantity(),
+                movement.price(),
+                movement.date()));
     }
 }

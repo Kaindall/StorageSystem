@@ -60,9 +60,6 @@ public class ProductImpl implements ProductGateway {
     public Product decrease(Long id, int quantity) {
         try {
             ProductEntity product = productRepository.findById(id).orElseThrow(()-> new ProductNotFoundException(id));
-            if (product.getQuantity() < quantity) {
-                throw new UnavailableProductQuantityException();
-            }
             product.setQuantity(product.getQuantity() - quantity);
             return productMapper.toDomain(productRepository.save(product));
         } catch (DataIntegrityViolationException e) {

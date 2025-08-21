@@ -3,8 +3,10 @@ package br.com.kaindall.products.application.web.controllers;
 import br.com.kaindall.products.application.web.dtos.requests.CreateProductDTO;
 import br.com.kaindall.products.application.web.dtos.requests.UpdateProductDTO;
 import br.com.kaindall.products.application.web.dtos.responses.ProductDTO;
+import br.com.kaindall.products.application.web.mappers.MovementMapper;
 import br.com.kaindall.products.application.web.mappers.ProductMapper;
 import br.com.kaindall.products.domain.category.services.CategoryService;
+import br.com.kaindall.products.domain.movement.entities.Movement;
 import br.com.kaindall.products.domain.product.facades.ProductFacade;
 import br.com.kaindall.products.domain.product.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +28,10 @@ public class ProductController {
     private final ProductService productService;
     private final CategoryService categoryService;
 
-    public ProductController(ProductFacade productFacade, ProductMapper productMapper, ProductService productService, CategoryService categoryService) {
+    public ProductController(ProductFacade productFacade,
+                             ProductMapper productMapper,
+                             ProductService productService,
+                             CategoryService categoryService) {
         this.productFacade = productFacade;
         this.productMapper = productMapper;
         this.productService = productService;
@@ -78,7 +83,7 @@ public class ProductController {
             @PathVariable(name="id_product") Long id,
             @Parameter(example = "122")
             @RequestParam int quantity) {
-        productFacade.increment(id, quantity, null);
+        productFacade.increase(id, quantity, null);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

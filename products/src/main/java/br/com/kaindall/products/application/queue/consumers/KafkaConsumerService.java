@@ -25,25 +25,7 @@ public class KafkaConsumerService {
 
     @KafkaListener(topics = "${kafka.consumer.topic}", containerFactory = "kafkaMovementListenerFactory")
     public void listen(MovementEvent event) {
-        try {
-            Movement movement = movementMapper.toDomain(event, (productService.find(event.productId())));
-            Movement createdMovement = productFacade.processMovement(movement);
-            productFacade.emitResult(createdMovement);
-
-        } catch (ProductNotFoundException exception) {
-            productFacade.emitResult(
-                    event.orderId(),
-                    new ProductNotFoundException(event.productId(), Map.of(
-                            "orderId", event.orderId(),
-                            "productId", event.productId()
-            )));
-        } catch (UnavailableProductQuantityException exception){
-            productFacade.emitResult(
-                    event.orderId(),
-                    new UnavailableProductQuantityException(Map.of(
-                            "orderId", event.orderId(),
-                            "productId", event.productId()
-            )));
-        }
+        Movement movement = movementMapper.toDomain(event, (productService.find(event.productId())));
+        productFacade.processMovement(movement);
     }
 }

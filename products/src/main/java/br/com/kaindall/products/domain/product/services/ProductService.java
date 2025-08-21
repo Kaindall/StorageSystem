@@ -1,5 +1,6 @@
 package br.com.kaindall.products.domain.product.services;
 
+import br.com.kaindall.products.domain.product.entities.exceptions.UnavailableProductQuantityException;
 import br.com.kaindall.products.domain.product.gateways.ProductGateway;
 import br.com.kaindall.products.domain.product.entities.Product;
 import br.com.kaindall.products.domain.product.entities.ProductsPage;
@@ -19,7 +20,13 @@ public class ProductService {
 
     public Product add(Long id, int quantity) {return productGateway.add(id, quantity);}
 
-    public Product decrease(Long id, int quantity) {return productGateway.decrease(id, quantity);}
+    public Product decrease(Long id, int quantity) {
+        Product currentProduct = productGateway.findById(id);
+        if (currentProduct.quantity() < quantity) {
+            throw new UnavailableProductQuantityException();
+        }
+        return productGateway.decrease(id, quantity);
+    }
 
     public void delete(Long id) {productGateway.deleteById(id);}
 
