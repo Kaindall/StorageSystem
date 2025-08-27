@@ -7,6 +7,11 @@ import br.com.kaindall.products.application.web.mappers.MovementMapper;
 import br.com.kaindall.products.application.web.mappers.ProductMapper;
 import br.com.kaindall.products.domain.category.services.CategoryService;
 import br.com.kaindall.products.domain.movement.entities.Movement;
+import br.com.kaindall.products.domain.movement.factories.MovementFactory;
+import br.com.kaindall.products.domain.movement.strategies.MovementStrategy;
+import br.com.kaindall.products.domain.movement.utils.builders.MovementBuilder;
+import br.com.kaindall.products.domain.movement.utils.enums.MovementType;
+import br.com.kaindall.products.domain.product.entities.Product;
 import br.com.kaindall.products.domain.product.facades.ProductFacade;
 import br.com.kaindall.products.domain.product.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5174")
@@ -27,15 +34,19 @@ public class ProductController {
     private final ProductMapper productMapper;
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final MovementMapper movementMapper;
+    private final MovementFactory movementFactory;
 
     public ProductController(ProductFacade productFacade,
                              ProductMapper productMapper,
                              ProductService productService,
-                             CategoryService categoryService) {
+                             CategoryService categoryService, MovementMapper movementMapper, MovementFactory movementFactory) {
         this.productFacade = productFacade;
         this.productMapper = productMapper;
         this.productService = productService;
         this.categoryService = categoryService;
+        this.movementMapper = movementMapper;
+        this.movementFactory = movementFactory;
     }
 
     @Operation(
@@ -83,7 +94,9 @@ public class ProductController {
             @PathVariable(name="id_product") Long id,
             @Parameter(example = "122")
             @RequestParam int quantity) {
-        productFacade.increase(id, quantity, null);
+        Product product = productService.find(id);
+        MovementStrategy movementStrategy = movementFactory.getMovement(MovementType.IN);
+        movementStrategy.execute(movementMapper.toDomain(product, quantity, MovementType.IN));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -130,7 +143,9 @@ public class ProductController {
         if (delete) {
             productFacade.remove(id);
         }
-        productFacade.decrease(id, quantity, null);
+        Product product = productService.find(id);
+        MovementStrategy movementStrategy = movementFactory.getMovement(MovementType.OUT);
+        movementStrategy.execute(movementMapper.toDomain(product, quantity, MovementType.OUT));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

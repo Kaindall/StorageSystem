@@ -1,7 +1,9 @@
 package br.com.kaindall.products.domain.product.facades;
 
 import br.com.kaindall.products.domain.exceptions.BusinessException;
+import br.com.kaindall.products.domain.movement.strategies.MovementStrategy;
 import br.com.kaindall.products.domain.movement.entities.Movement;
+import br.com.kaindall.products.domain.movement.factories.MovementFactory;
 import br.com.kaindall.products.domain.movement.utils.enums.MovementType;
 import br.com.kaindall.products.domain.product.entities.Product;
 import br.com.kaindall.products.domain.product.entities.exceptions.ProductNotFoundException;
@@ -20,20 +22,16 @@ import java.util.Map;
 public class ProductFacade {
     private final ProductService productService;
     private final MovementService movementService;
+    private final MovementFactory movementFactory;
 
-    public ProductFacade(ProductService productService, MovementService movementService) {
+    public ProductFacade(
+            ProductService productService,
+            MovementService movementService,
+            MovementFactory movementFactory
+            ) {
         this.productService = productService;
         this.movementService = movementService;
-    }
-
-    public Movement increase(Long productId, int quantity, Long orderId) {
-        Product product = productService.add(productId, quantity);
-        return movementService.add(product, quantity, orderId);
-    }
-
-    public Movement decrease(Long productId, int quantity, Long orderId) {
-        Product product = productService.decrease(productId, quantity);
-        return movementService.decrease(product, quantity, orderId);
+        this.movementFactory = movementFactory;
     }
 
     public void remove(Long productId) {
@@ -44,18 +42,8 @@ public class ProductFacade {
 
     public void processMovement(Movement movement) {
         try {
-            switch (movement.type()) {
-                case MovementType.IN -> {
-                    Movement createdMovement = increase(movement.product().id(), movement.quantity(), movement.orderId());
-                    emitResult(createdMovement);
-                }
-                case MovementType.OUT -> {
-                    Movement createdMovement = decrease(movement.product().id(), movement.quantity(), movement.orderId());
-                    emitResult(createdMovement);
-                }
-                case CANCELED -> movementService.cancel(movement);
-
-            };
+            MovementStrategy movementStrategy = movementFactory.getMovement(movement.type());
+            movementStrategy.execute(movement);
         }  catch (ProductNotFoundException exception) {
             emitResult(
                     movement.orderId(),
@@ -72,7 +60,6 @@ public class ProductFacade {
                     )));
         }
     }
-
 
     public void emitResult(Movement movement) {
         movementService.result(movement);
