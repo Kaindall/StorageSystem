@@ -1,13 +1,12 @@
-package br.com.kaindall.products.domain.movement;
+package br.com.kaindall.products.domain.movement.strategies.impl;
 
 import br.com.kaindall.products.domain.movement.entities.Movement;
 import br.com.kaindall.products.domain.movement.services.MovementService;
-import br.com.kaindall.products.domain.product.entities.Product;
-import br.com.kaindall.products.domain.product.services.ProductService;
+import br.com.kaindall.products.domain.movement.strategies.MovementStrategy;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MovementCancel implements MovementInterface {
+public class MovementCancel implements MovementStrategy {
 
     private final MovementService movementService;
 

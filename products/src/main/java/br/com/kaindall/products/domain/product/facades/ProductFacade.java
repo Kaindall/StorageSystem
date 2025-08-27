@@ -1,9 +1,9 @@
 package br.com.kaindall.products.domain.product.facades;
 
 import br.com.kaindall.products.domain.exceptions.BusinessException;
-import br.com.kaindall.products.domain.movement.MovementInterface;
+import br.com.kaindall.products.domain.movement.strategies.MovementStrategy;
 import br.com.kaindall.products.domain.movement.entities.Movement;
-import br.com.kaindall.products.domain.movement.factory.MovementFactory;
+import br.com.kaindall.products.domain.movement.factories.MovementFactory;
 import br.com.kaindall.products.domain.movement.utils.enums.MovementType;
 import br.com.kaindall.products.domain.product.entities.Product;
 import br.com.kaindall.products.domain.product.entities.exceptions.ProductNotFoundException;
@@ -42,32 +42,8 @@ public class ProductFacade {
 
     public void processMovement(Movement movement) {
         try {
-            MovementInterface movementInterface = movementFactory.getMovement(movement.type());
-
-            movementInterface.execute(movement);
-        }  catch (ProductNotFoundException exception) {
-            emitResult(
-                    movement.orderId(),
-                    new ProductNotFoundException(movement.product().id(), Map.of(
-                            "orderId", movement.orderId(),
-                            "productId", movement.product().id()
-                    )));
-        } catch (UnavailableProductQuantityException exception){
-            emitResult(
-                    movement.orderId(),
-                    new UnavailableProductQuantityException(Map.of(
-                            "orderId", movement.orderId(),
-                            "productId", movement.product().id()
-                    )));
-        }
-    }
-
-    public void processMovementAndEmitResult(Movement movement) {
-        try {
-            MovementInterface movementInterface = movementFactory.getMovement(movement.type());
-
-            var createdMovement = movementInterface.execute(movement);
-            emitResult(createdMovement);
+            MovementStrategy movementStrategy = movementFactory.getMovement(movement.type());
+            movementStrategy.execute(movement);
         }  catch (ProductNotFoundException exception) {
             emitResult(
                     movement.orderId(),

@@ -1,9 +1,9 @@
-package br.com.kaindall.products.domain.movement.factory;
+package br.com.kaindall.products.domain.movement.factories;
 
-import br.com.kaindall.products.domain.movement.MovementCancel;
-import br.com.kaindall.products.domain.movement.MovementDecrease;
-import br.com.kaindall.products.domain.movement.MovementIncrease;
-import br.com.kaindall.products.domain.movement.MovementInterface;
+import br.com.kaindall.products.domain.movement.strategies.impl.MovementCancel;
+import br.com.kaindall.products.domain.movement.strategies.impl.MovementDecrease;
+import br.com.kaindall.products.domain.movement.strategies.impl.MovementIncrease;
+import br.com.kaindall.products.domain.movement.strategies.MovementStrategy;
 import br.com.kaindall.products.domain.movement.utils.enums.MovementType;
 
 public class MovementFactory {
@@ -22,7 +22,7 @@ public class MovementFactory {
         this.movementCancel = movementCancel;
     }
 
-    public MovementInterface getMovement(MovementType movementType) {
+    public MovementStrategy getMovement(MovementType movementType) {
         return switch (movementType) {
             case MovementType.IN -> this.movementIncrease;
             case MovementType.OUT -> this.movementDecrease;
