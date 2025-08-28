@@ -34,6 +34,16 @@ public class ProductFacade {
         this.movementFactory = movementFactory;
     }
 
+    public Movement increase(Movement movement) {
+        Product product = productService.add(movement.product().id(), movement.quantity());
+        return movementService.decrease(product, movement.quantity(), movement.orderId());
+    }
+
+    public Movement decrease(Movement movement) {
+        Product product = productService.decrease(movement.product().id(), movement.quantity());
+        return movementService.decrease(product, movement.quantity(), movement.orderId());
+    }
+
     public void remove(Long productId) {
         Product product = productService.find(productId);
         productService.delete(productId);
@@ -66,30 +76,30 @@ public class ProductFacade {
     }
 
     public void emitResult(Long orderId, BusinessException exception) {
-        Map<Long, Integer> batchDecrease = new HashMap<>();
-        Map<Long, Integer> batchIncrease = new HashMap<>();
-        List<Movement> toCancel = new ArrayList<>();
+        Map<Long, Integer> productListToDecrease = new HashMap<>();
+        Map<Long, Integer> productListToIncrease = new HashMap<>();
+        List<Movement> movementListToCancel = new ArrayList<>();
 
         movementService.findAll(orderId)
                 .forEach(movement -> {
                     Long productId = movement.product().id();
                     int quantity = movement.quantity();
-                    toCancel.add(movement);
+                    movementListToCancel.add(movement);
 
                     switch (movement.type()) {
                         case MovementType.IN -> {
-                            int currentQuantity = batchDecrease.getOrDefault(productId, 0);
-                            batchDecrease.put(productId, currentQuantity + quantity);
+                            int currentQuantity = productListToDecrease.getOrDefault(productId, 0);
+                            productListToDecrease.put(productId, currentQuantity + quantity);
                         }
                         case MovementType.OUT -> {
-                            int currentQuantity = batchIncrease.getOrDefault(productId, 0);
-                            batchIncrease.put(productId, currentQuantity + quantity);
+                            int currentQuantity = productListToIncrease.getOrDefault(productId, 0);
+                            productListToIncrease.put(productId, currentQuantity + quantity);
                         }
                     }
                 });
-        batchDecrease.forEach(this::silentDecrease);
-        batchIncrease.forEach(this::silentIncrement);
-        movementService.cancelAll(toCancel);
+        productListToDecrease.forEach(this::silentDecrease);
+        productListToIncrease.forEach(this::silentIncrement);
+        movementService.cancelAll(movementListToCancel);
         movementService.invalidate(exception);
     }
 

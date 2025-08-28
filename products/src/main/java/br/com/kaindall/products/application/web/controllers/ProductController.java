@@ -94,9 +94,7 @@ public class ProductController {
             @PathVariable(name="id_product") Long id,
             @Parameter(example = "122")
             @RequestParam int quantity) {
-        Product product = productService.find(id);
-        MovementStrategy movementStrategy = movementFactory.getMovement(MovementType.IN);
-        movementStrategy.execute(movementMapper.toDomain(product, quantity, MovementType.IN));
+        productFacade.processMovement(movementMapper.toDomain(productService.find(id), quantity, MovementType.IN));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -143,9 +141,7 @@ public class ProductController {
         if (delete) {
             productFacade.remove(id);
         }
-        Product product = productService.find(id);
-        MovementStrategy movementStrategy = movementFactory.getMovement(MovementType.OUT);
-        movementStrategy.execute(movementMapper.toDomain(product, quantity, MovementType.OUT));
+        productFacade.processMovement(movementMapper.toDomain(productService.find(id), quantity, MovementType.OUT));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
