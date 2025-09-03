@@ -5,7 +5,9 @@ import br.com.kaindall.products.domain.movement.strategies.impl.MovementDecrease
 import br.com.kaindall.products.domain.movement.strategies.impl.MovementIncrease;
 import br.com.kaindall.products.domain.movement.strategies.MovementStrategy;
 import br.com.kaindall.products.domain.movement.utils.enums.MovementType;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MovementFactory {
 
     private final MovementIncrease movementIncrease;
@@ -22,7 +24,7 @@ public class MovementFactory {
         this.movementCancel = movementCancel;
     }
 
-    public MovementStrategy getMovement(MovementType movementType) {
+    public MovementStrategy getMovementStrategy(MovementType movementType) {
         return switch (movementType) {
             case MovementType.IN -> this.movementIncrease;
             case MovementType.OUT -> this.movementDecrease;

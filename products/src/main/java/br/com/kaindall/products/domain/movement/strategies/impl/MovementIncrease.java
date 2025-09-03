@@ -20,7 +20,7 @@ public class MovementIncrease implements MovementStrategy {
 
     @Override
     public Movement execute(Movement movement) {
-        Product product = productService.add(movement.product().id(), movement.quantity());
-        return movementService.add(product, movement.quantity(), movement.orderId());
+        Product product = productService.increase(movement.product().id(), movement.quantity());
+        return movementService.increase(product, movement.quantity(), movement.orderId());
     }
 }

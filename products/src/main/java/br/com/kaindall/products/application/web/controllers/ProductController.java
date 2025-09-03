@@ -6,12 +6,8 @@ import br.com.kaindall.products.application.web.dtos.responses.ProductDTO;
 import br.com.kaindall.products.application.web.mappers.MovementMapper;
 import br.com.kaindall.products.application.web.mappers.ProductMapper;
 import br.com.kaindall.products.domain.category.services.CategoryService;
-import br.com.kaindall.products.domain.movement.entities.Movement;
 import br.com.kaindall.products.domain.movement.factories.MovementFactory;
-import br.com.kaindall.products.domain.movement.strategies.MovementStrategy;
-import br.com.kaindall.products.domain.movement.utils.builders.MovementBuilder;
 import br.com.kaindall.products.domain.movement.utils.enums.MovementType;
-import br.com.kaindall.products.domain.product.entities.Product;
 import br.com.kaindall.products.domain.product.facades.ProductFacade;
 import br.com.kaindall.products.domain.product.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5174")
@@ -57,7 +51,7 @@ public class ProductController {
     public ResponseEntity<Long> createProduct(@RequestBody CreateProductDTO product) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(productService.save(productMapper.toDomain(
+                .body(productService.create(productMapper.toDomain(
                         product,
                         categoryService.retrieveByName(product.categoryName())))
                         .id()
@@ -120,7 +114,7 @@ public class ProductController {
             @Parameter(description="Identificador do produto-alvo")
             @PathVariable(name="id_product") Long id,
             @RequestBody UpdateProductDTO product) {
-        productService.save(productMapper.toDomain(product, id, categoryService.retrieveByName(product.categoryName())));
+        productService.create(productMapper.toDomain(product, id, categoryService.retrieveByName(product.categoryName())));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

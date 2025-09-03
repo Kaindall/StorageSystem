@@ -6,7 +6,7 @@ import br.com.kaindall.products.domain.product.entities.ProductsPage;
 import java.util.List;
 
 public interface ProductGateway {
-    Product add(Long id, int quantity);
+    Product increase(Long id, int quantity);
 
     Product decrease(Long id, int quantity);
 

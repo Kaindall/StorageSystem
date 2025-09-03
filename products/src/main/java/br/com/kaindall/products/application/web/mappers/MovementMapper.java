@@ -17,17 +17,17 @@ public class MovementMapper {
                 movement.movementId(),
                 movement.orderId(),
                 movement.product().id(),
-                movement.type(),
+                movement.movementType(),
                 movement.quantity(),
                 movement.price(),
                 movement.date()
         );
     }
 
-    public Movement toDomain(Product product, int quantity, MovementType type) {
+    public Movement toDomain(Product product, int quantity, MovementType movementType) {
         return new MovementBuilder()
                 .withProduct(product)
-                .withType(type)
+                .withType(movementType)
                 .withQuantity(quantity)
                 .withPrice(product.price().multiply(BigDecimal.valueOf(quantity)))
                 .withDate(LocalDateTime.now())

@@ -17,8 +17,6 @@ public class MovementCancel implements MovementStrategy {
     @Override
     public Movement execute(Movement movement) {
         movementService.cancel(movement);
-
-        // TODO corrigir
         return movement;
     }
 }

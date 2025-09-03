@@ -33,7 +33,7 @@ public class MovementResultImpl implements MovementResultGateway {
     }
 
     @Override
-    public void invalidate(BusinessException exception) {
+    public void publishFail(BusinessException exception) {
         Map<String, Object> metadata = exception.getMetadata();
         Long productId = metadata.containsKey("productId") ? (Long) metadata.get("productId") : null;
         Long orderId = metadata.containsKey("orderId") ? (Long) metadata.get("orderId") : null;

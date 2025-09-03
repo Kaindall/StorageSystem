@@ -10,7 +10,7 @@ public record Movement(
         Long movementId,
         Long orderId,
         Product product,
-        MovementType type,
+        MovementType movementType,
         int quantity,
         BigDecimal price,
         LocalDateTime date

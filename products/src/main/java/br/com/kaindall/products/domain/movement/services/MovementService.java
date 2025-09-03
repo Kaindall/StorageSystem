@@ -23,7 +23,7 @@ public class MovementService {
         this.movementResultGateway = movementResultGateway;
     }
 
-    public Movement add(Product product, int quantity, Long orderId) {
+    public Movement increase(Product product, int quantity, Long orderId) {
         Movement movement = new MovementBuilder()
                 .withOrderId(orderId)
                 .withProduct(product)
@@ -47,17 +47,17 @@ public class MovementService {
         return movementGateway.save(movement);
     }
 
-    public List<Movement> findAll(Long orderId) {
+    public List<Movement> findAllByOrderId(Long orderId) {
         return movementGateway.findAll(orderId);
     }
 
 
-    public void result(Movement movement) {
+    public void publishResult(Movement movement) {
         movementResultGateway.publish(movement);
     }
 
-    public void invalidate(BusinessException exception) {
-        movementResultGateway.invalidate(exception);
+    public void publishResultFailed(BusinessException exception) {
+        movementResultGateway.publishFail(exception);
     }
 
     public void cancelAll(List<Movement> movements) {

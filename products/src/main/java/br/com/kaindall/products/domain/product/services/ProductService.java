@@ -18,7 +18,7 @@ public class ProductService {
 
     public Product find(Long id) {return productGateway.findById(id);}
 
-    public Product add(Long id, int quantity) {return productGateway.add(id, quantity);}
+    public Product increase(Long id, int quantity) {return productGateway.increase(id, quantity);}
 
     public Product decrease(Long id, int quantity) {
         Product currentProduct = productGateway.findById(id);
@@ -32,5 +32,5 @@ public class ProductService {
 
     public List<Product> findAll(ProductsPage productsPage) {return productGateway.findAll(productsPage);}
 
-    public Product save(Product product) {return productGateway.save(product);}
+    public Product create(Product product) {return productGateway.save(product);}
 }

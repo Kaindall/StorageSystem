@@ -40,7 +40,7 @@ public class MovementsController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(
-                        movementService.findAll(id)
+                        movementService.findAllByOrderId(id)
                                 .stream()
                                 .map(movementMapper::toDTO)
                                 .toList()

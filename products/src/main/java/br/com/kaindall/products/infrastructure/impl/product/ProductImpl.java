@@ -46,7 +46,7 @@ public class ProductImpl implements ProductGateway {
     }
 
     @Override
-    public Product add(Long id, int quantity) {
+    public Product increase(Long id, int quantity) {
         try {
             ProductEntity product = productRepository.findById(id).orElseThrow(()-> new ProductNotFoundException(id));
             product.setQuantity(product.getQuantity()+quantity);

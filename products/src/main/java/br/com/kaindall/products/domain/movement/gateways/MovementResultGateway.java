@@ -5,5 +5,5 @@ import br.com.kaindall.products.domain.movement.entities.Movement;
 
 public interface MovementResultGateway {
     void publish(Movement movement);
-    void invalidate(BusinessException exception);
+    void publishFail(BusinessException exception);
 }

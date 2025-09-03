@@ -12,10 +12,9 @@ import br.com.kaindall.products.domain.product.services.ProductService;
 import br.com.kaindall.products.domain.movement.services.MovementService;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 
 @Component
@@ -34,16 +33,6 @@ public class ProductFacade {
         this.movementFactory = movementFactory;
     }
 
-    public Movement increase(Movement movement) {
-        Product product = productService.add(movement.product().id(), movement.quantity());
-        return movementService.decrease(product, movement.quantity(), movement.orderId());
-    }
-
-    public Movement decrease(Movement movement) {
-        Product product = productService.decrease(movement.product().id(), movement.quantity());
-        return movementService.decrease(product, movement.quantity(), movement.orderId());
-    }
-
     public void remove(Long productId) {
         Product product = productService.find(productId);
         productService.delete(productId);
@@ -52,17 +41,19 @@ public class ProductFacade {
 
     public void processMovement(Movement movement) {
         try {
-            MovementStrategy movementStrategy = movementFactory.getMovement(movement.type());
+            MovementStrategy movementStrategy = movementFactory.getMovementStrategy(movement.movementType());
             movementStrategy.execute(movement);
         }  catch (ProductNotFoundException exception) {
-            emitResult(
+            cancelAllMovementsInOrder(
                     movement.orderId(),
-                    new ProductNotFoundException(movement.product().id(), Map.of(
-                            "orderId", movement.orderId(),
-                            "productId", movement.product().id()
+                    new ProductNotFoundException(
+                            movement.product().id(),
+                            Map.of(
+                                    "orderId", movement.orderId(),
+                                    "productId", movement.product().id()
                     )));
         } catch (UnavailableProductQuantityException exception){
-            emitResult(
+            cancelAllMovementsInOrder(
                     movement.orderId(),
                     new UnavailableProductQuantityException(Map.of(
                             "orderId", movement.orderId(),
@@ -71,39 +62,28 @@ public class ProductFacade {
         }
     }
 
-    public void emitResult(Movement movement) {
-        movementService.result(movement);
+    public void cancelAllMovementsInOrder(Long orderId, BusinessException exception) {
+        List<Movement> movements = movementService.findAllByOrderId(orderId);
+        revertProductsQuantities(movements);
+        movementService.cancelAll(movements);
+        movementService.publishResultFailed(exception);
     }
 
-    public void emitResult(Long orderId, BusinessException exception) {
-        Map<Long, Integer> productListToDecrease = new HashMap<>();
-        Map<Long, Integer> productListToIncrease = new HashMap<>();
-        List<Movement> movementListToCancel = new ArrayList<>();
+    private void revertProductsQuantities(List<Movement> movements) {
+        Map<MovementType, BiConsumer<Long, Integer>> revertActions = Map.of(
+                MovementType.IN, this::silentDecrease,
+                MovementType.OUT, this::silentIncrease
+        );
 
-        movementService.findAll(orderId)
-                .forEach(movement -> {
-                    Long productId = movement.product().id();
-                    int quantity = movement.quantity();
-                    movementListToCancel.add(movement);
-
-                    switch (movement.type()) {
-                        case MovementType.IN -> {
-                            int currentQuantity = productListToDecrease.getOrDefault(productId, 0);
-                            productListToDecrease.put(productId, currentQuantity + quantity);
-                        }
-                        case MovementType.OUT -> {
-                            int currentQuantity = productListToIncrease.getOrDefault(productId, 0);
-                            productListToIncrease.put(productId, currentQuantity + quantity);
-                        }
-                    }
-                });
-        productListToDecrease.forEach(this::silentDecrease);
-        productListToIncrease.forEach(this::silentIncrement);
-        movementService.cancelAll(movementListToCancel);
-        movementService.invalidate(exception);
+        movements
+                .stream()
+                .filter(movement -> revertActions.containsKey(movement.movementType()))
+                .forEach(movement -> revertActions
+                        .get(movement.movementType())
+                        .accept(movement.product().id(), movement.quantity()));
     }
 
-    private void silentIncrement(Long productId, int quantity) {productService.add(productId, quantity);}
+    private void silentIncrease(Long productId, int quantity) {productService.increase(productId, quantity);}
 
     private void silentDecrease(Long productId, int quantity) {productService.decrease(productId, quantity);}
 

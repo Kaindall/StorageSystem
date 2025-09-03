@@ -21,7 +21,7 @@ public class MovementEntityMapper {
                 movement.movementId(),
                 productMapper.toEntity(movement.product()),
                 movement.orderId(),
-                movement.type(),
+                movement.movementType(),
                 movement.quantity(),
                 movement.date()
         );
