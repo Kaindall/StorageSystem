@@ -19,6 +19,9 @@ import java.util.function.BiConsumer;
 
 @Component
 public class ProductFacade {
+    private static final String ORDER_ID = "orderId";
+    private static final String PRODUCT_ID = "productId";
+
     private final ProductService productService;
     private final MovementService movementService;
     private final MovementFactory movementFactory;
@@ -49,15 +52,15 @@ public class ProductFacade {
                     new ProductNotFoundException(
                             movement.product().id(),
                             Map.of(
-                                    "orderId", movement.orderId(),
-                                    "productId", movement.product().id()
+                                    ORDER_ID, movement.orderId(),
+                                    PRODUCT_ID, movement.product().id()
                     )));
         } catch (UnavailableProductQuantityException exception){
             cancelAllMovementsInOrder(
                     movement.orderId(),
                     new UnavailableProductQuantityException(Map.of(
-                            "orderId", movement.orderId(),
-                            "productId", movement.product().id()
+                            ORDER_ID, movement.orderId(),
+                            PRODUCT_ID, movement.product().id()
                     )));
         }
     }
