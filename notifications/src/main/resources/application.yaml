@@ -2,9 +2,6 @@ server:
   port: 8083
   servlet:
     context-path: /notifications
-spring:
-  application:
-    name: notifications
 eureka:
   client:
     service-url:
@@ -12,8 +9,8 @@ eureka:
   instance:
     prefer-ip-address: false
     hostname: app-notifications
-#kafka:
-#  url: kafka:9092
-#  consumer:
-#    topic: notification
-#    group-id: notifications-consumer-1
+kafka:
+  url: kafka:9092
+  consumer:
+    topic: notification-queue
+    group-id: notification-consumer-1
