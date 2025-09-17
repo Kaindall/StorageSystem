@@ -12,5 +12,6 @@ class KafkaNotificationConsumer(private val notificationService: NotificationSer
     @KafkaListener(topics = ["\${kafka.consumer.topic}"], containerFactory = "kafkaNotificationListenerFactory")
     fun listen(event: NotificationEvent) {
         notificationService.send(event.toDomain())
+        println("Mensagem consumida com sucesso!")
     }
 }

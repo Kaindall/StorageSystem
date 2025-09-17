@@ -114,6 +114,18 @@ services:
       - database
       - queue
 
+  app-notifications:
+    build:
+      context: ./notifications
+    depends_on:
+      kafka:
+        condition: service_started
+    ports:
+      - "8003:8083"
+    networks:
+      - backend
+      - queue
+
   app-gateway:
     build:
       context: ./gateway

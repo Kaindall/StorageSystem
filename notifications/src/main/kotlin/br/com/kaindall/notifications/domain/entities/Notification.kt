@@ -1,14 +1,19 @@
 package br.com.kaindall.notifications.domain.entities
 
 data class Notification(
-    var id: Long?,
     val userId: Long,
+    val channel: NotificationChannel,
     val type: NotificationType,
-    val message: String,
-)
+) {
+    init {
+        require(userId >= 0) { "Id não pode ser negativo: $userId" }
+    }
+}
 
-enum class NotificationType {
+enum class NotificationChannel {
     EMAIL, SMS
 }
 
-
+enum class NotificationType {
+    PAYMENT_PENDING, PAYMENT_CONFIRMED, PRODUCT_DELIVERING, PRODUCT_SENT
+}
