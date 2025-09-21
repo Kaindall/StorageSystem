@@ -80,9 +80,9 @@ class NotificationServiceTest {
     }
 
     @Test
-    fun `deve retornar erro por serviço de notificação inválido`(){
+    fun `deve retornar erro por serviço de notificação indisponível`(){
         val notification = Notification(123, NotificationChannel.SMS, NotificationType.PRODUCT_SENT)
-        every { notificationSmsStrategy.send(any()) } throws RuntimeException("Serviço inválido")
+        every { notificationSmsStrategy.send(any()) } throws RuntimeException("Serviço indisponível")
 
         assertThrows<RuntimeException> { notificationService.send(notification) }
     }

@@ -15,14 +15,15 @@ kafka:
     topic: notification-queue
     group-id: notification-consumer-1
 twilio:
-  number:
   account:
+    number:
     sid:
     token:
 spring:
   mail:
     host: sandbox.smtp.mailtrap.io
     port: 587
+    origin: teste@email.com
     username:
     password: 
     properties:

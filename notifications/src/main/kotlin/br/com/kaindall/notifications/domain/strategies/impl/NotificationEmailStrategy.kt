@@ -2,7 +2,6 @@ package br.com.kaindall.notifications.domain.strategies.impl
 
 import br.com.kaindall.notifications.domain.entities.Email
 import br.com.kaindall.notifications.domain.entities.Notification
-import br.com.kaindall.notifications.domain.entities.User
 import br.com.kaindall.notifications.domain.enums.EmailNotificationType
 import br.com.kaindall.notifications.domain.ports.EmailNotifier
 import br.com.kaindall.notifications.domain.ports.UserFinder
