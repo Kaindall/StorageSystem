@@ -23,7 +23,7 @@ services:
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     ports:
-      - "9070:8080"
+      - "9090:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local-kraft
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9094
@@ -46,22 +46,47 @@ services:
     networks:
       - security
 
-  mysql:
-    image: mysql:8.0
+  sonarqube:
+    image: sonarqube:25.9.0.112764-community
+    container_name: sonarqube
+    ports:
+      - "9005:9000"
+    depends_on:
+      - postgres
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/SONAR
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    networks:
+      - sast
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sSf http://localhost:9000 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  postgres:
+    image: postgres:16
     container_name: db_storage
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: STORAGE
-      MYSQL_USER: Kaindall
-      MYSQL_PASSWORD: 123456
+      POSTGRES_DB: STORAGE
+      POSTGRES_USER: Kaindall
+      POSTGRES_PASSWORD: 123456
     ports:
-      - "9000:3306"
+      - "9000:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
     networks:
       - database
+      - sast
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U Kaindall -d STORAGE || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -72,18 +97,18 @@ services:
     depends_on:
       app-discovery:
         condition: service_started
-      mysql:
+      postgres:
         condition: service_healthy
     ports:
       - "8000:8082"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/STORAGE?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/STORAGE
       SPRING_DATASOURCE_USERNAME: Kaindall
       SPRING_DATASOURCE_PASSWORD: 123456
-      SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
       SPRING_JPA_HIBERNATE_DDL-AUTO: create
       SPRING_JPA_SHOW-SQL: "true"
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SPRINGDOC_API-DOCS_PATH: /openapi
       SPRINGDOC_SWAGGER-UI_PATH: /openapi-ui
     networks:
@@ -97,18 +122,18 @@ services:
     depends_on:
       kafka:
         condition: service_started
-      mysql:
+      postgres:
         condition: service_healthy
     ports:
       - "8001:8081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/STORAGE?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/STORAGE
       SPRING_DATASOURCE_USERNAME: Kaindall
       SPRING_DATASOURCE_PASSWORD: 123456
-      SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
       SPRING_JPA_HIBERNATE_DDL-AUTO: create
       SPRING_JPA_SHOW-SQL: "true"
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
     networks:
       - backend
       - database
@@ -118,6 +143,8 @@ services:
     build:
       context: ./notifications
     depends_on:
+      sonarqube:
+        condition: service_healthy
       kafka:
         condition: service_started
     ports:
@@ -125,6 +152,7 @@ services:
     networks:
       - backend
       - queue
+      - sast
 
   app-gateway:
     build:
@@ -155,7 +183,11 @@ services:
       - backend
 
 volumes:
-  mysql_data:
+  postgresql:
+  postgresql_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
 
 networks:
   backend:
@@ -165,4 +197,6 @@ networks:
   queue:
     driver: bridge
   security:
+    driver: bridge
+  sast:
     driver: bridge

@@ -6,17 +6,17 @@ spring:
   application:
     name: products
   datasource:
-    url: jdbc:mysql://mysql:3306/STORAGE?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:postgresql://postgres:5432/STORAGE
     username: Kaindall
     password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: create
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 springdoc:
   api-docs:
     path: /openapi
